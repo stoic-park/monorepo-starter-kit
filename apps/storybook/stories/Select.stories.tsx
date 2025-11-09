@@ -68,7 +68,7 @@ export const Disabled: Story = {
 
 export const FullWidth: Story = {
   args: {
-    label: '부??,
+    label: '부서',
     options: defaultOptions,
     fullWidth: true,
   },

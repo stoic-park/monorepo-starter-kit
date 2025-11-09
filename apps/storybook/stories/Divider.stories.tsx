@@ -28,9 +28,9 @@ export const Horizontal: Story = {
   args: {},
   render: () => (
     <div className="w-96">
-      <p className="text-sm">�?번째 ?�션</p>
+      <p className="text-sm">첫번째 섹션</p>
       <Divider />
-      <p className="text-sm">??번째 ?�션</p>
+      <p className="text-sm">두번째 섹션</p>
     </div>
   ),
 };
@@ -83,7 +83,7 @@ export const Vertical: Story = {
       <Divider orientation="vertical" />
       <span className="text-sm">가?�데</span>
       <Divider orientation="vertical" />
-      <span className="text-sm">?�른�?/span>
+      <span className="text-sm">다른텍스트</span>
     </div>
   ),
 };

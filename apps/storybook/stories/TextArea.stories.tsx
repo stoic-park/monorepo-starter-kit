@@ -69,8 +69,8 @@ export const NoResize: Story = {
 
 export const HorizontalResize: Story = {
   args: {
-    label: '가�?리사?�즈',
-    placeholder: '가로로�??�기 조절 가??,
+    label: '가로 리사이즈',
+    placeholder: '가로로만 크기 조절 가능',
     resize: 'horizontal',
   },
 };
