@@ -77,8 +77,8 @@ export const HorizontalResize: Story = {
 
 export const LargeTextArea: Story = {
   args: {
-    label: '�??�용',
-    placeholder: '�??�용???�력?�세??,
+    label: '긴 내용',
+    placeholder: '긴 내용을 입력하세요',
     rows: 10,
   },
 };

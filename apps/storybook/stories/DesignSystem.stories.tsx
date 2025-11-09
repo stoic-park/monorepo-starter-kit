@@ -146,7 +146,7 @@ export const DesignSystemOverview: Story = {
           <section>
             <Card variant="elevated" padding="lg">
               <Stack spacing="3xl" className="p-10">
-                <Typography variant="h2">?�� ?�?�포그래??/Typography>
+                <Typography variant="h2">타이포그래피</Typography>
 
                 <Stack spacing="2xl">
                   <div className="p-4 bg-slate-50 rounded-lg">

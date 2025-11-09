@@ -79,7 +79,7 @@ export const FullWidth: Story = {
 
 export const Small: Story = {
   args: {
-    label: '부??,
+    label: '부서',
     options: defaultOptions,
     size: 'sm',
   },
