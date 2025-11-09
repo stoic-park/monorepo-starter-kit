@@ -53,8 +53,8 @@ export const Error: Story = {
 
 export const Disabled: Story = {
   args: {
-    label: '?�명',
-    placeholder: '비활?�화??,
+    label: '설명',
+    placeholder: '비활성화됨',
     disabled: true,
   },
 };

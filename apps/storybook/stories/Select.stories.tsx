@@ -60,7 +60,7 @@ export const Error: Story = {
 
 export const Disabled: Story = {
   args: {
-    label: '부??,
+    label: '부서',
     options: defaultOptions,
     disabled: true,
   },

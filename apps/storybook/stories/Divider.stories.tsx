@@ -37,7 +37,7 @@ export const Horizontal: Story = {
 
 export const WithLabel: Story = {
   args: {
-    label: '?�는',
+    label: '또는',
     labelPosition: 'center',
   },
   render: (args) => (
@@ -51,7 +51,7 @@ export const WithLabel: Story = {
 
 export const LabelLeft: Story = {
   args: {
-    label: '추�? ?�션',
+    label: '추가 옵션',
     labelPosition: 'left',
   },
   render: (args) => (
