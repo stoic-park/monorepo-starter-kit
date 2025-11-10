@@ -91,7 +91,10 @@ export const Horizontal: Story = {
 };
 
 export const SpacingComparison: Story = {
-  args: {},
+  args: {
+    spacing: 'xs',
+    direction: 'vertical',
+  },
   render: () => (
     <Stack spacing="4xl">
       <Card variant="bordered">
@@ -142,15 +145,18 @@ export const SpacingComparison: Story = {
 };
 
 export const NestedStacks: Story = {
-  args: {},
+  args: {
+    spacing: 'xl',
+    direction: 'vertical',
+  },
   render: () => (
     <Stack spacing="3xl">
       <Card variant="elevated" padding="lg">
         <Stack spacing="xl">
-          <Typography variant="h3">중첩??Stack ?�시</Typography>
+          <Typography variant="h3">중첩된 Stack 예시</Typography>
 
           <Stack spacing="lg">
-            <Typography variant="h4">가�?버튼 그룹</Typography>
+            <Typography variant="h4">가로 버튼 그룹</Typography>
             <Stack direction="horizontal" spacing="md">
               <Button variant="primary">확인</Button>
               <Button variant="outline">취소</Button>
@@ -158,11 +164,11 @@ export const NestedStacks: Story = {
           </Stack>
 
           <Stack spacing="lg">
-            <Typography variant="h4">?�로 버튼 그룹</Typography>
+            <Typography variant="h4">세로 버튼 그룹</Typography>
             <Stack spacing="sm">
-              <Button fullWidth>?�션 1</Button>
-              <Button fullWidth>?�션 2</Button>
-              <Button fullWidth>?�션 3</Button>
+              <Button fullWidth>옵션 1</Button>
+              <Button fullWidth>옵션 2</Button>
+              <Button fullWidth>옵션 3</Button>
             </Stack>
           </Stack>
         </Stack>

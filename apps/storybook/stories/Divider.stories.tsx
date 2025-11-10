@@ -25,7 +25,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Horizontal: Story = {
-  args: {},
+  args: {
+    orientation: 'horizontal',
+  },
   render: () => (
     <div className="w-96">
       <p className="text-sm">첫번째 섹션</p>
@@ -63,7 +65,7 @@ export const LabelLeft: Story = {
 
 export const LabelRight: Story = {
   args: {
-    label: '??보기',
+    label: '더 보기',
     labelPosition: 'right',
   },
   render: (args) => (
@@ -89,20 +91,22 @@ export const Vertical: Story = {
 };
 
 export const InCard: Story = {
-  args: {},
+  args: {
+    orientation: 'horizontal',
+  },
   render: () => (
     <div className="w-96 p-6 bg-white border border-gray-200 rounded-lg">
-      <h3 className="text-lg font-bold mb-2">카드 ?�목</h3>
-      <p className="text-sm text-gray-600 mb-4">�?번째 ?�션???�용?�니??</p>
+      <h3 className="text-lg font-bold mb-2">카드 제목</h3>
+      <p className="text-sm text-gray-600 mb-4">첫번째 섹션의 내용입니다</p>
 
       <Divider />
 
-      <h3 className="text-lg font-bold mb-2">??번째 ?�션</h3>
-      <p className="text-sm text-gray-600 mb-4">??번째 ?�션???�용?�니??</p>
+      <h3 className="text-lg font-bold mb-2">두번째 섹션</h3>
+      <p className="text-sm text-gray-600 mb-4">두번째 섹션의 내용입니다</p>
 
-      <Divider label="추�? ?�보" />
+      <Divider label="추가 정보" />
 
-      <p className="text-sm text-gray-600">??번째 ?�션???�용?�니??</p>
+      <p className="text-sm text-gray-600">세번째 섹션의 내용입니다</p>
     </div>
   ),
 };

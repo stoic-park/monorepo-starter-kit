@@ -29,7 +29,7 @@ export const Default: Story = {
   args: {
     name: 'option',
     value: '1',
-    label: '?�션 1',
+    label: '옵션 1',
   },
 };
 
@@ -37,8 +37,8 @@ export const WithDescription: Story = {
   args: {
     name: 'option',
     value: '1',
-    label: '?�션 1',
-    description: '???�션???�???�명?�니??',
+    label: '옵션 1',
+    description: '이 옵션에 대한 설명입니다',
   },
 };
 
@@ -46,7 +46,7 @@ export const Error: Story = {
   args: {
     name: 'option',
     value: '1',
-    label: '?�수 ?�택',
+    label: '필수 선택',
     error: true,
   },
 };
@@ -77,22 +77,28 @@ export const WithoutLabel: Story = {
 };
 
 export const Group: Story = {
-  args: { name: '', value: '' },
+  args: {
+    name: 'size',
+    value: 'sm',
+  },
   render: () => (
     <div className="flex flex-col gap-3">
       <Radio name="size" value="sm" label="Small" defaultChecked />
       <Radio name="size" value="md" label="Medium" />
       <Radio name="size" value="lg" label="Large" />
-      <Radio name="size" value="xl" label="Extra Large (비활?�화)" disabled />
+      <Radio name="size" value="xl" label="Extra Large (비활성화)" disabled />
     </div>
   ),
 };
 
 export const UseYnGroup: Story = {
-  args: { name: '', value: '' },
+  args: {
+    name: 'useYn',
+    value: 'Y',
+  },
   render: () => (
     <div className="flex flex-col gap-2">
-      <div className="text-sm font-medium text-gray-900 mb-1">?�용 ?��?</div>
+      <div className="text-sm font-medium text-gray-900 mb-1">사용 여부</div>
       <div className="flex gap-4">
         <Radio name="useYn" value="Y" label="Y" defaultChecked />
         <Radio name="useYn" value="N" label="N" />
