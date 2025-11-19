@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
@@ -223,7 +224,7 @@ describe('Modal', () => {
   it('controlled 모드로 작동해야 함', async () => {
     const user = userEvent.setup();
     const TestComponent = () => {
-      const [open, setOpen] = React.useState(false);
+      const [open, setOpen] = useState(false);
 
       return (
         <div>

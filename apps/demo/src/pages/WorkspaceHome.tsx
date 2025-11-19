@@ -1,8 +1,8 @@
 import React from 'react';
-import Header from '../components/workspace/Header';
-import TabMenu from '../components/workspace/TabMenu';
-import Sidebar from '../components/workspace/Sidebar';
-import Frame from '../components/workspace/Frame';
+import Header from '../components/semes/Header';
+import TabMenu from '../components/semes/TabMenu';
+import Sidebar from '../components/semes/Sidebar';
+import Frame from '../components/semes/Frame';
 import { ITabMenu, ISideMenu } from '../types/menu';
 import { getHeaderMenus } from '../data/mockMenu';
 import { useTabManager, useToggle, useLocalStorage } from '../hooks';
@@ -90,4 +90,3 @@ const WorkspaceHome: React.FC = () => {
 };
 
 export default WorkspaceHome;
-

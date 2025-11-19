@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
@@ -94,7 +95,9 @@ describe('RadioGroup', () => {
       </RadioGroup>
     );
 
-    expect(screen.getByText('모든 기능을 사용할 수 있습니다')).toBeInTheDocument();
+    expect(
+      screen.getByText('모든 기능을 사용할 수 있습니다')
+    ).toBeInTheDocument();
   });
 
   it('disabled 상태가 적용되어야 함', () => {
@@ -149,7 +152,11 @@ describe('RadioGroup', () => {
   it('커스텀 className이 적용되어야 함', () => {
     render(
       <RadioGroup className="custom-group">
-        <RadioGroupItem value="1" className="custom-item" data-testid="custom-radio" />
+        <RadioGroupItem
+          value="1"
+          className="custom-item"
+          data-testid="custom-radio"
+        />
       </RadioGroup>
     );
 
@@ -174,7 +181,7 @@ describe('RadioGroup', () => {
   it('controlled 모드로 작동해야 함', async () => {
     const user = userEvent.setup();
     const TestComponent = () => {
-      const [value, setValue] = React.useState('1');
+      const [value, setValue] = useState('1');
 
       return (
         <div>

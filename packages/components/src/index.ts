@@ -18,3 +18,4 @@ export * from './Stack';
 // Organisms
 export * from './Modal';
 export * from './Toast';
+export { ToastProvider } from './Toast';
