@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Module resolution - bundler mode with node16 fallback for types */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["../../node_modules/@types", "./node_modules/@types"],
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@design-system/components": ["../../packages/components/src/index.ts"],
+      "@design-system/components/*": ["../../packages/components/src/*"],
+      "@design-system/tokens": ["../../packages/tokens/src/index.ts"],
+      "@design-system/tokens/*": ["../../packages/tokens/src/*"],
+      "@design-system/theme": ["../../packages/theme/index.js"]
+    },
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

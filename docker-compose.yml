@@ -37,6 +37,22 @@ services:
         reservations:
           memory: 128M
 
+  # Demo App
+  demo:
+    build:
+      context: .
+      dockerfile: ./apps/demo/Dockerfile
+    container_name: ds-demo
+    restart: unless-stopped
+    networks:
+      - frontend-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
   # Storybook 문서
   storybook:
     build:

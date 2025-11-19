@@ -16,12 +16,14 @@
 
 ```
 monorepo-design-system-template/
-├── packages/               # 공유 라이브러리
-│   ├── components/        # UI 컴포넌트
-│   ├── tokens/           # 디자인 토큰
-│   └── theme/            # Tailwind 테마
-└── apps/                 # 애플리케이션
-    └── storybook/        # 디자인 시스템 문서
+├── packages/                    # 공유 라이브러리
+│   ├── components/             # UI 컴포넌트 (@design-system/components)
+│   ├── tokens/                 # 디자인 토큰 (@design-system/tokens)
+│   ├── tokens-product-1/       # 제품별 토큰 (@design-system/tokens-product-1)
+│   └── theme/                  # Tailwind 테마 (@design-system/theme)
+└── apps/                       # 애플리케이션
+    ├── demo/                   # 데모 애플리케이션
+    └── storybook/              # 디자인 시스템 문서
 ```
 
 ### 배포 아키텍처
@@ -33,13 +35,15 @@ monorepo-design-system-template/
 │  │  Nginx (Port 80) │  │
 │  │  - Reverse Proxy │  │
 │  │  - Load Balancer │  │
+│  │  - Rate Limiting │  │
 │  └────────┬─────────┘  │
 │           │             │
-│           ▼             │
-│     ┌─────────┐         │
-│     │Storybook│         │
-│     │Container│         │
-│     └─────────┘         │
+│     ┌─────┴─────┐       │
+│     ▼           ▼       │
+│  ┌─────────┐ ┌──────┐  │
+│  │Storybook│ │ Demo │  │
+│  │Container│ │ App  │  │
+│  └─────────┘ └──────┘  │
 └─────────────────────────┘
 ```
 
@@ -65,27 +69,94 @@ version: '3.8'
 services:
   nginx:
     image: nginx:alpine
+    container_name: ds-nginx
     ports:
       - '80:80'
       - '443:443'
     volumes:
       - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - storybook
+      - demo
     restart: unless-stopped
+    networks:
+      - frontend-network
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  demo:
+    build:
+      context: .
+      dockerfile: ./apps/demo/Dockerfile
+    container_name: ds-demo
+    restart: unless-stopped
+    networks:
+      - frontend-network
 
   storybook:
     build:
       context: .
       dockerfile: ./apps/storybook/Dockerfile
+    container_name: ds-storybook
     restart: unless-stopped
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 ```
 
 ### Dockerfile 패턴
 
+#### 방법 1: turbo prune 사용 (권장 - 이미지 크기 최적화)
+
 ```dockerfile
-# 멀티 스테이지 빌드
+FROM node:18-alpine AS base
+
+# 1. Prune Stage: 필요한 패키지만 추출
+FROM base AS builder
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+RUN npm install turbo --global
+COPY . .
+RUN turbo prune --scope=your-app --docker
+
+# 2. Install & Build Stage
+FROM base AS installer
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+RUN corepack enable
+
+# 의존성 설치
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --frozen-lockfile
+
+# 소스 코드 복사 및 빌드
+COPY --from=builder /app/out/full/ .
+COPY turbo.json turbo.json
+RUN pnpm turbo run build --filter=your-app...
+
+# 3. Runner Stage
+FROM nginx:alpine AS runner
+WORKDIR /usr/share/nginx/html
+COPY --from=installer /app/apps/your-app/dist .
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+#### 방법 2: 전통적인 멀티 스테이지 빌드
+
+```dockerfile
 FROM node:18-alpine AS base
 RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
 
@@ -113,30 +184,60 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ### Nginx 설정
 
+#### 메인 설정 (deploy/nginx/nginx.conf)
+
+```nginx
+http {
+    # Gzip 압축
+    gzip on;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css application/json application/javascript;
+
+    # Rate Limiting
+    limit_req_zone $binary_remote_addr zone=general:10m rate=10r/s;
+
+    # Upstream 설정
+    upstream storybook {
+        server storybook:80 max_fails=3 fail_timeout=30s;
+    }
+    upstream demo {
+        server demo:80 max_fails=3 fail_timeout=30s;
+    }
+
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
+#### 가상 호스트 설정 (deploy/nginx/conf.d/default.conf)
+
 ```nginx
 server {
     listen 80;
-    root /usr/share/nginx/html;
-    index index.html;
+    server_name _;
 
     # 보안 헤더
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # Gzip 압축
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript;
+    # Rate Limiting 적용
+    limit_req zone=general burst=20 nodelay;
 
-    # 정적 자산 캐싱
-    location ~* \.(css|js|jpg|png|gif|svg|woff|woff2)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
+    # Storybook 문서 (기본 경로)
+    location / {
+        proxy_pass http://storybook/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 
-    # SPA 라우팅
-    location / {
-        try_files $uri $uri/ /index.html;
+    # Demo App
+    location /demo {
+        proxy_pass http://demo/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 
     # 헬스체크
@@ -170,10 +271,17 @@ cd apps/your-app
   "dependencies": {
     "@design-system/components": "workspace:*",
     "@design-system/tokens": "workspace:*",
+    "@design-system/tokens-product-1": "workspace:*",
     "@design-system/theme": "workspace:*"
   }
 }
 ```
+
+**주요 패키지 설명:**
+- `@design-system/components`: React UI 컴포넌트 라이브러리 (Button, Input, Modal 등)
+- `@design-system/tokens`: 기본 디자인 토큰 (흑백 미니멀리즘)
+- `@design-system/tokens-product-1`: 제품별 브랜드 토큰 (St Tropaz 컬러)
+- `@design-system/theme`: Tailwind CSS 테마 프리셋
 
 ### 2. Dockerfile 작성
 
@@ -195,18 +303,31 @@ services:
 
 ### 4. Nginx 라우팅 추가
 
+#### deploy/nginx/nginx.conf에 upstream 추가
+
 ```nginx
-# deploy/nginx/conf.d/default.conf
-
-upstream your_app {
-    server your-app:80;
+http {
+    upstream your_app {
+        server your-app:80 max_fails=3 fail_timeout=30s;
+    }
+    
+    include /etc/nginx/conf.d/*.conf;
 }
+```
 
+#### deploy/nginx/conf.d/default.conf에 location 추가
+
+```nginx
 server {
-    location /your-app/ {
+    listen 80;
+    
+    # Your App
+    location /your-app {
         proxy_pass http://your_app/;
+        proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
 ```
@@ -412,6 +533,7 @@ docker system prune -a
 
 ## 참고 문서
 
+- [온프레미스 환경 최적화 가이드](./ONPREMISE.md) - 온프레미스 환경을 고려한 최적화 기법
 - [빠른 시작 가이드](../QUICKSTART_ONPREMISE.md)
 - [배포 가이드](../deploy/README.md)
 - [Docker 공식 문서](https://docs.docker.com/)
